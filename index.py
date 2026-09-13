@@ -50,3 +50,39 @@ def limpar_inteiro(valor):#EXTRAI E CONVERTE VALORES PARA INTEIRO COM CONDICIONA
                 return int(numero_str)
             else:
                 return None
+#=================
+def limpar_decimal(valor):#NORMAIZA E CONVERTE FORMATOS MONETÁRIOS
+    
+    if pd.isna(valor):
+        return None
+    else:
+        texto = str(valor)
+        if texto == "":
+            return None
+        else:
+            #FILTRA APENAS DIGITOS, VÍRGULA E SINA DE MENOS
+            texto_limpo = re.sub(r'[^\d,-]', '', texto)           
+            if texto_limpo == "" or texto_limpo == "-":
+                return None
+            else:
+                if ',' in texto_limpo:
+                    texto_limpo = texto_limpo.replace(',', '.')
+                else:
+                    pass
+                
+                try:
+                    return float(texto_limpo)
+                except ValueError:
+                    return None
+
+#CARREGAMENTO E ESTRUTURAÇÃO DA BASE DE DADOS
+#CARREGA O ARQUIVO CSV
+df = pd.read_csv('BaseVarejo.csv', sep=';', encoding='utf-8')
+df = df.loc[:, ~df.columns.str.contains('^Unnamed')].dropna(how='all', axis=1)
+
+#APLICAÇÃO DAS FUNÇÕES DE LIMPEZA E PADRONIZAÇÃO
+df['PR_NOME'] = df['PR_NOME'].apply(limpar_texto)
+df['PR_CAT'] = df['PR_CAT'].apply(limpar_texto)
+df['CO_ID'] = df['CO_ID'].apply(limpar_inteiro)
+df['CL_ID'] = df['CL_ID'].apply(limpar_inteiro)
+
