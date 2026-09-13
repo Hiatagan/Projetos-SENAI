@@ -86,3 +86,49 @@ df['PR_CAT'] = df['PR_CAT'].apply(limpar_texto)
 df['CO_ID'] = df['CO_ID'].apply(limpar_inteiro)
 df['CL_ID'] = df['CL_ID'].apply(limpar_inteiro)
 
+#----------ESTATÍSTICA DESCRITIVA--------------
+# AGRUPAENTO POR CLIENTE UNICO
+df_clientes = df.groupby('CL_ID')['CL_FHL'].first()
+
+#QUARTIS 0.25 E 0.75
+q1 = df_clientes.quantile(0.25)
+q3 = df_clientes.quantile(0.75)
+
+#ESTRUTURAÇÃO COM ESTATÍSTICA
+estatisticas_filhos = pd.DataFrame({
+    'Parâmetro Estatístico': [
+        'Contagem (Count)',
+        'Média',
+        'Mediana',
+        'Moda',
+        'Desvio Padrão',
+        'Variância',
+        'Mínimo',
+        '1º Quartil (Q1 - 25%)',
+        '3º Quartil (Q3 - 75%)',
+        'Intervalo Interquartil (IQR)',
+        'Máximo',
+        'Amplitude Total',
+        'Assimetria (Skewness)',
+        'Curtose (Kurtosis)'
+    ],
+    'Valor': [
+        len(df_clientes),                             # Contagem
+        round(df_clientes.mean(), 4),                # Média
+        round(df_clientes.median(), 4),              # Mediana
+        int(df_clientes.mode()[0]),                  # Moda
+        round(df_clientes.std(), 4),                 # Desvio Padrão
+        round(df_clientes.var(), 4),                 # Variância
+        int(df_clientes.min()),                      # Mínimo
+        round(q1, 4),                                # Q1
+        round(q3, 4),                                # Q3
+        round(q3 - q1, 4),                           # IQR
+        int(df_clientes.max()),                      # Máximo
+        int(df_clientes.max() - df_clientes.min()),  # Amplitude Total
+        round(df_clientes.skew(), 4),                # Assimetria
+        round(df_clientes.kurt(), 4)                 # Curtose
+    ]
+})
+
+#PRINT FINAL   
+print(estatisticas_filhos.to_string(index=False))
